@@ -1,0 +1,12 @@
+services:
+  web:
+    image: node:24-alpine
+    build: .
+    ports:
+      - "8081:8081"             #Puerto por el que trabaja EXPO
+    working_dir: /app
+    volumes:
+      - ./app:/app
+      - /app/node_modules       # Hace que no se cree la carpeta node_modules en nuestra carpeta /home
+    stdin_open: true            # Evita que react-scripts se cierre inmediatamente
+    tty: true

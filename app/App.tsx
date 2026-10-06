@@ -1,24 +1,61 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Saludo from './Saludo.tsx';
+
+import { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import BotoCalculadora from './src/components/BotoCalculadora';
+import PantallaCalculadora from './src/components/PantallaCalculadora';
+import { aplicaTecla, estatInicial } from './src/logica/calculadora';
+
+
+const files = [
+  ['AC', '±', '%', '÷'],
+  ['7', '8', '9', '×'],
+  ['4', '5', '6', '−'],
+  ['1', '2', '3', '+'],
+  ['0', '.', '⌫', '='],
+];
 
 export default function App() {
+  const [estat, setEstat] = useState(estatInicial);
+  function premTecla(tecla: string) {
+    setEstat((anterior) => aplicaTecla(anterior, tecla));
+  }
+
+  const operacio = estat.operador !== null
+    ? String(estat.anterior) + ' ' + estat.operador
+    : '';
+
   return (
-    // Agrega aquí tu <View> y <Text> con sus respectivos estilos
-    <View style={styles.contenedor}>
-      <Saludo idioma='es'/>
-      <Saludo idioma='en'/>
-      <Saludo />
-    </View>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.arrel}>
+        <View style={styles.contingut}>
+          <View style={styles.calculadora}>
+            <Text style={styles.titol}>Calculadora</Text>
+            <PantallaCalculadora valor={estat.pantalla} operacio={operacio} />
+            {files.map((fila, index) => (
+              <View key={index} style={styles.fila}>
+                {fila.map((tecla) => (
+                  <BotoCalculadora
+                    key={tecla}
+                    text={tecla}
+                    onPress={() => premTecla(tecla)}
+                  />
+                ))}
+              </View>
+            ))}
+          </View>
+        </View>
+        <StatusBar style="dark" />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  // Define tus estilos aquí
-  contenedor: {
-    flex : 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: '#f5f5f5'
-  }
+  arrel: { flex: 1, backgroundColor: '#ffffff' },
+  contingut: { flex: 1, justifyContent: 'center', padding: 20 },
+  calculadora: { width: '100%' },
+  titol: { fontSize: 24, marginBottom: 16 },
+  fila: { flexDirection: 'row', gap: 8, marginBottom: 8 },
 });
